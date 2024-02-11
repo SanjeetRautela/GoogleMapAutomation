@@ -1,0 +1,46 @@
+name: CI pipeline
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    env:
+     BUILD_CONFIG: 'Release'
+     SOLUTION: 'GoogleMapAutomation.sln'
+     
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 5.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore $SOLUTION
+      
+    - name: Build
+      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG
+      
+    - name: Test
+      run: dotnet test $SOLUTION --configuration $BUILD_CONFIG --logger "trx;LogFileName=test-results.trx" || true
+
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Test Execution Report
+        path: "**/test-results.trx"                            
+        reporter: dotnet-trx
+        fail-on-error: true
