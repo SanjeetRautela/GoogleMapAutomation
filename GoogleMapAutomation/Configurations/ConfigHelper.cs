@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.IO;
-using System.Reflection;
 
 namespace GoogleMapAutomation.Configurations
 {
@@ -11,8 +9,7 @@ namespace GoogleMapAutomation.Configurations
         static ConfigHelper()
         {
             AppSettings = new ConfigurationBuilder()
-                .SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location))
-                      .AddJsonFile("appsettings.json").Build();
+                      .AddJsonFile("appSettings.json").Build();
         }
 
     }
